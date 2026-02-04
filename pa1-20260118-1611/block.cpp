@@ -13,7 +13,7 @@
 **/
 int Block::Dimension() const {
 	/* your code here */
-	return 0;
+	return data.size();
 }
 
 /**
@@ -26,6 +26,17 @@ int Block::Dimension() const {
 **/
 void Block::Render(PNG& img, int x, int y, int scale) const {
 	/* your code here */
+    for (unsigned i = 0; i < this->Dimension(); i++) { // x
+        for (unsigned j = 0; j < this->Dimension(); j++) { // y
+            RGBAPixel pixel = this->data[j][i];
+
+            for (unsigned dx = 0; dx < scale; dx++) {
+                for (unsigned dy = 0; dy < scale; dy++) {
+                    *img.getPixel(x + dx + i * scale, y + dy + j * scale) = pixel;
+                }
+            }
+        }
+    }
 
 }
 
