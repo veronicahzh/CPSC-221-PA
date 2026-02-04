@@ -25,19 +25,26 @@ int Block::Dimension() const {
  * @pre scale >= 1
 **/
 void Block::Render(PNG& img, int x, int y, int scale) const {
-	/* your code here */
-    for (unsigned i = 0; i < this->Dimension(); i++) { // x
-        for (unsigned j = 0; j < this->Dimension(); j++) { // y
-            RGBAPixel pixel = this->data[j][i];
+	int rowIndex = 0;
+    for (vector<RGBAPixel> row : data) { 
+        
+        int colIndex = 0;
+        for (RGBAPixel pixel : row) {
 
-            for (unsigned dx = 0; dx < scale; dx++) {
-                for (unsigned dy = 0; dy < scale; dy++) {
-                    *img.getPixel(x + dx + i * scale, y + dy + j * scale) = pixel;
+            int startX = x + colIndex * scale;
+            int startY = y + rowIndex * scale;
+
+            for (int dx = 0; dx < scale; dx++) {
+                for (int dy = 0; dy < scale; dy++) {
+                    *img.getPixel(startX + dx, startY + dy) = pixel;
                 }
             }
-        }
-    }
 
+            colIndex++;
+        }
+        
+        rowIndex++;
+    }
 }
 
 /**
