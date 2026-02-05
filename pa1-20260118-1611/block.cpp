@@ -81,6 +81,14 @@ void Block::Build(PNG& img, int x, int y, int dimension) {
  *       7 8 9      3 6 9
 **/
 void Block::Transpose() {
-	/* your code here */
+    int D = Dimension();
+
+    for (int row = 0; row < D; row++) {
+        for (int col = row + 1; col < D; col++) {
+            RGBAPixel temp = data[row][col];
+            data[row][col] = data[col][row];
+            data[col][row] = temp;
+        }
+    }
 
 }
