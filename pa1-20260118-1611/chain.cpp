@@ -26,7 +26,27 @@
  * @pre   imIn's height will be exactly divisible by the resulting block dimension
 **/
 Chain::Chain(PNG& imIn, int numCols) {
-    /* your code here */
+    NW = nullptr;
+    Node* tail = nullptr;
+
+    columns_ = numCols;
+    int blockDim = imIn.width() / columns_;
+    rows_ = imIn.height() / blockDim;
+
+    roworder = true;
+
+    // build row by row
+    for (int row = 0; row < rows_; row++) {
+        for (int col = 0; col < columns_; col++) {
+            int x = col * blockDim;
+            int y = row * blockDim;
+
+            Block b;
+            b.Build(imIn, x, y, blockDim);
+
+            tail = InsertAfter(tail, b);
+        }
+    }
 
 }
 
