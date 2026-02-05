@@ -58,9 +58,9 @@ Chain::~Chain() {
 	Node *curr = NW;
 
     while(curr != nullptr) {
-        Node *temp = curr->next;
+        Node *next = curr->next;
         delete curr;
-        curr = temp;
+        curr = next;
     }
 
     NW = nullptr;
@@ -94,8 +94,16 @@ Node* Chain::InsertAfter(Node* p, const Block &ndata) {
  * current Chain class.
 **/
 void Chain::Clear() {
-	/* your code here */
+	Node *curr = NW;
+    while (curr != nullptr) {
+        Node *next = curr->next;
+        delete curr;
+        curr = next;
+    }
 
+    NW = nullptr;
+    rows_ = 0;
+    columns_ = 0;
 }
 
 /**
@@ -106,8 +114,25 @@ void Chain::Clear() {
  * constructor and the assignment operator for Chains.
 **/
 void Chain::Copy(Chain const &other) {
-	/* your code here */
+	rows_ = other.rows_;
+    columns_ = other.columns_;
+    roworder = other.roworder;
 
+    if (other.NW == nullptr) {
+        NW = nullptr;
+        return;
+    }
+
+    NW = new Node(other.NW->data);
+
+    Node *currThis = NW;
+    Node *currOther = other.NW->next;
+
+    while (currOther != nullptr) {
+        currThis->next = new Node(currOther->data);
+        currThis = currThis->next;
+        currOther = currOther->next;
+    }
 }
 
 /**
