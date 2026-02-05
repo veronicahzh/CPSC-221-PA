@@ -26,7 +26,7 @@ int Block::Dimension() const {
 **/
 void Block::Render(PNG& img, int x, int y, int scale) const {
 	int rowIndex = 0;
-    for (vector<RGBAPixel> row : data) { 
+    for (vector<RGBAPixel> row : data) {
         
         int colIndex = 0;
         for (RGBAPixel pixel : row) {
@@ -53,7 +53,23 @@ void Block::Render(PNG& img, int x, int y, int scale) const {
  * in img. Assumes img is large enough to supply these pixels.
 **/
 void Block::Build(PNG& img, int x, int y, int dimension) {
-	/* your code here */
+    data.clear();
+	
+    data.resize(dimension); // data has dimension rows
+
+    for (int row = 0; row < dimension; row++) { // y direction
+        data[row].resize(dimension); // each row has dimension pixels (row x col = dim x dim)
+
+        for (int col = 0; col < dimension; col++) { // x direction
+            
+            int startX = x + col;
+            int startY = y + row;
+
+            RGBAPixel *pixel = img.getPixel(startX, startY);
+
+            data[row][col] = *pixel; // store copy of pixel into block
+        }
+    }
 
 }
 
