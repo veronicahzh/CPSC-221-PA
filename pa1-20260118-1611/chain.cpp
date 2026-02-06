@@ -215,8 +215,31 @@ void Chain::ToRowOrder() {
  * Has no effect on a list which is already in column order.
 **/
 void Chain::ToColumnOrder() {
-    /* your code here */
+     if (roworder) {
+        Node *curr = NW;
+        vector<Node*> v;
 
+        while(curr != nullptr) {
+            v.push_back(curr);
+            curr = curr->next;
+        }
+
+        vector<Node*> colV(v.size());
+
+        for (int i = 0; i < v.size(); i++) {
+            int col = i % columns_;
+            int row = i / columns_;
+            int colIndex = col * rows_ + row;
+            colV[colIndex] = v[i];
+        }
+
+        for (int i = 0; i < colV.size() - 1; i++) {
+            colV[i]->next = colV[i + 1];
+        }
+        colV.back()->next = nullptr;
+        NW= colV[0];
+        roworder = true;
+    }
 }
 
 /**
