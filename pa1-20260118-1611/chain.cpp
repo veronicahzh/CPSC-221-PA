@@ -168,7 +168,7 @@ PNG Chain::Render(int scale) {
         index++;
     }
 
-    return scalePNG();
+    return scalePNG;
 }
 
 /**
@@ -179,7 +179,31 @@ PNG Chain::Render(int scale) {
  * Has no effect on a list which is already in row order.
 **/
 void Chain::ToRowOrder() {
-    /* your code here */
+    if (!roworder) {
+        Node *curr = NW;
+        vector<Node*> v;
+
+        while(curr != nullptr) {
+            v.push_back(curr);
+            curr = curr->next;
+        }
+
+        vector<Node*> rowV(v.size());
+
+        for (int i = 0; i < v.size(); i++) {
+            int row = i % rows_;
+            int col = i / rows_;
+            int rowIndex = row * columns_ + col;
+            rowV[rowIndex] = v[i];
+        }
+
+        for (int i = 0; i < rowV.size() - 1; i++) {
+            rowV[i]->next = rowV[i + 1];
+        }
+        rowV.back()->next = nullptr;
+        NW= rowV[0];
+        roworder = true;
+    }
 
 }
 
