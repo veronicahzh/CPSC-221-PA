@@ -55,15 +55,7 @@ Chain::Chain(PNG& imIn, int numCols) {
  * memory does not leak on destruction of a chain.
 **/
 Chain::~Chain() {
-	Node *curr = NW;
-
-    while(curr != nullptr) {
-        Node *next = curr->next;
-        delete curr;
-        curr = next;
-    }
-
-    NW = nullptr;
+	Clear();
 }
 
 /**
@@ -144,8 +136,39 @@ void Chain::Copy(Chain const &other) {
  * @pre scale >= 1
 **/
 PNG Chain::Render(int scale) {
-    /* your code here */
-    return PNG();
+    if (NW == nullptr) {
+        return PNG();
+    }
+    int blockDim = NW->data.Dimension();
+    int scaleW = columns_ * blockDim * scale;
+    int scaleH = rows_ * blockDim * scale;
+
+    PNG scalePNG(scaleW, scaleH);
+
+    Node *curr = NW;
+    int index = 0; // which node are we on
+
+    while (curr != nullptr) {
+        int rowIndex;
+        int colIndex;
+
+        if (roworder) {
+            rowIndex = index / columns_;
+            colIndex = index % columns_;
+        } else {
+            rowIndex = index % rows_;
+            colIndex = index / rows_;
+        }
+
+        int x = colIndex * blockDim * scale;
+        int y = rowIndex * blockDim * scale;
+
+        curr->data.Render(scalePNG, x, y, scale);
+        curr = curr->next;
+        index++;
+    }
+
+    return scalePNG();
 }
 
 /**
