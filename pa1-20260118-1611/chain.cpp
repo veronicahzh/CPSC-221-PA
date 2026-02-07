@@ -136,39 +136,26 @@ void Chain::Copy(Chain const &other) {
  * @pre scale >= 1
 **/
 PNG Chain::Render(int scale) {
-    if (NW == nullptr) {
-        return PNG();
-    }
-    int blockDim = NW->data.Dimension();
-    int scaleW = columns_ * blockDim * scale;
-    int scaleH = rows_ * blockDim * scale;
-
-    PNG scalePNG(scaleW, scaleH);
-
     Node *curr = NW;
-    int index = 0; // which node are we on
+    int scaledDim = curr->data.Dimension() * scale;
+    PNG img = PNG(columns_ * scaledDim, rows_ * scaledDim);
 
-    while (curr != nullptr) {
-        int rowIndex;
-        int colIndex;
-
-        if (roworder) {
-            rowIndex = index / columns_;
-            colIndex = index % columns_;
-        } else {
-            rowIndex = index % rows_;
-            colIndex = index / rows_;
+    if (roworder) {
+        for (int row = 0; row < rows_; row++) {
+            for (int col = 0; col < columns_; col++) {
+                curr->data.Render(img, col * scaledDim, row * scaledDim, scale);
+                curr = curr->next;
+            }
         }
-
-        int x = colIndex * blockDim * scale;
-        int y = rowIndex * blockDim * scale;
-
-        curr->data.Render(scalePNG, x, y, scale);
-        curr = curr->next;
-        index++;
+    } else {
+        for (int col = 0; col < columns_; col++) {
+            for (int row = 0; row < rows_; row++) {
+                curr->data.Render(img, col * scaledDim, row * scaledDim, scale);
+                curr = curr->next;
+            }
+        }
     }
-
-    return scalePNG;
+    return img;
 }
 
 /**
@@ -188,20 +175,15 @@ void Chain::ToRowOrder() {
             curr = curr->next;
         }
 
-        vector<Node*> rowV(v.size());
-
-        for (int i = 0; i < v.size(); i++) {
-            int row = i % rows_;
-            int col = i / rows_;
-            int rowIndex = row * columns_ + col;
-            rowV[rowIndex] = v[i];
+        for (int row = 0; row < v.size() - 1; row++) {
+            if (row + rows_ >= v.size()) {
+                int back = row + rows_ - v.size() + 1;
+                v[row]->next = v[back];
+            } else {
+                v[row]->next = v[row+rows_];
+            }
         }
 
-        for (int i = 0; i < rowV.size() - 1; i++) {
-            rowV[i]->next = rowV[i + 1];
-        }
-        rowV.back()->next = nullptr;
-        NW= rowV[0];
         roworder = true;
     }
 
@@ -215,7 +197,7 @@ void Chain::ToRowOrder() {
  * Has no effect on a list which is already in column order.
 **/
 void Chain::ToColumnOrder() {
-     if (roworder) {
+    if (roworder) {
         Node *curr = NW;
         vector<Node*> v;
 
@@ -224,21 +206,16 @@ void Chain::ToColumnOrder() {
             curr = curr->next;
         }
 
-        vector<Node*> colV(v.size());
-
-        for (int i = 0; i < v.size(); i++) {
-            int col = i % columns_;
-            int row = i / columns_;
-            int colIndex = col * rows_ + row;
-            colV[colIndex] = v[i];
+        for (int col = 0; col < v.size() - 1; col++) {
+            if (col + columns_ >= v.size()) {
+                int back = col + columns_ - v.size() + 1;
+                v[col]->next = v[back];
+            } else {
+                v[col]->next = v[col+columns_];
+            }
         }
 
-        for (int i = 0; i < colV.size() - 1; i++) {
-            colV[i]->next = colV[i + 1];
-        }
-        colV.back()->next = nullptr;
-        NW= colV[0];
-        roworder = true;
+        roworder = false;
     }
 }
 
@@ -254,8 +231,17 @@ void Chain::ToColumnOrder() {
  *  C -> D                     B     D
 **/
 void Chain::Transpose() {
-    /* your code here */
+    int oldRows = rows_;
+    rows_ = columns_;
+    columns_ = oldRows;
 
+    Node *curr = NW;
+    while(curr != nullptr) {
+        curr->data.Transpose();
+        curr = curr->next;
+    }
+
+    roworder = !roworder;
 }
 
 /**************************************************
