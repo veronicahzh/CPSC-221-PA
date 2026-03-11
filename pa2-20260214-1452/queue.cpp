@@ -1,8 +1,10 @@
 /**
  * @file queue.cpp
  * @description Implementations for PA2, Queue class
- * @author (your CWLs)
+ * @author (vhzh)
 **/
+
+#include "queue.h"
 
 /**
  * Adds the parameter object to the back of the Queue.
@@ -12,7 +14,7 @@
 template <class T>
 void Queue<T>::Enqueue(T newItem) {
     /* YOUR CODE HERE! */
-
+    myQueue.PushR(newItem);
 }
 
 /**
@@ -24,7 +26,7 @@ void Queue<T>::Enqueue(T newItem) {
 template <class T>
 T Queue<T>::Dequeue() {
     /* YOUR CODE HERE! */
-    T removed;
+    T removed = myQueue.PopL();
 
     return removed;
 }
@@ -38,7 +40,7 @@ T Queue<T>::Dequeue() {
 template <class T>
 T Queue<T>::Peek() {
     /* YOUR CODE HERE! */
-    T peeked;
+    T peeked = myQueue.PeekL();
 
     return peeked;
 }
@@ -50,6 +52,5 @@ T Queue<T>::Peek() {
 **/
 template <class T>
 bool Queue<T>::IsEmpty() const {
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return true;
+    return myQueue.IsEmpty();
 }
