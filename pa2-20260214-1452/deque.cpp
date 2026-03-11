@@ -1,13 +1,16 @@
 /**
  * @file deque.cpp
  * @description Implementations for PA2, Deque class
- * @author (your CWLs)
+ * @author (vhzh)
 **/
+
+#include "deque.h"
 
 template <class T>
 Deque<T>::Deque() {
     /* YOUR CODE HERE! */
-
+    n1 = 0;
+    n2 = 0;
 }
 
 /**
@@ -18,7 +21,8 @@ Deque<T>::Deque() {
 template <class T>
 void Deque<T>::PushR(T newItem) {
     /* YOUR CODE HERE! */
-
+    data.push_back(newItem);
+    n2++; // increase data size
 }
 
 /**
@@ -32,7 +36,19 @@ void Deque<T>::PushR(T newItem) {
 template <class T>
 T Deque<T>::PopL() {
     /* YOUR CODE HERE! */
-    T removed;
+    T removed = data[n1];
+    n1++; // new start of data vector
+    n2--; // decrease count if data size
+    if (IsEmpty()) n1 = 0; // reset start
+    
+    else if (n2 <= n1) {
+        vector<T> newData;
+        for (int i = n1; i < n1 + n2; i++) {
+            newData.push_back(data[i]); // copy elements from data to newData
+        }
+        data = newData;
+        n1 = 0; // reset start
+    }
 
     return removed;
 }
@@ -45,8 +61,20 @@ T Deque<T>::PopL() {
 template <class T>
 T Deque<T>::PopR() {
     /* YOUR CODE HERE! */
-    T removed;
+    T removed = data[n1 + n2 - 1];
+    n2--;
+    data.pop_back();
+    if (IsEmpty()) n1 = 0;
 
+    else if (n2 <= n1) {
+        vector<T> newData;
+        for (int i = n1; i < n1 + n2; i++) {
+            newData.push_back(data[i]); // copy elements from data to newData
+        }
+        data = newData;
+        n1 = 0; // reset start
+    }
+    
     return removed;
 }
 
@@ -59,7 +87,7 @@ T Deque<T>::PopR() {
 template <class T>
 T Deque<T>::PeekL() {
     /* YOUR CODE HERE! */
-    T peeked;
+    T peeked = data[n1];
 
     return peeked;
 }
@@ -73,7 +101,7 @@ T Deque<T>::PeekL() {
 template <class T>
 T Deque<T>::PeekR() {
     /* YOUR CODE HERE! */
-    T peeked;
+    T peeked = data[n1 + n2 - 1];
 
     return peeked;
 }
@@ -85,6 +113,6 @@ T Deque<T>::PeekR() {
 **/
 template <class T>
 bool Deque<T>::IsEmpty() const {
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return true;
+    return n2 == 0;
+
 }
