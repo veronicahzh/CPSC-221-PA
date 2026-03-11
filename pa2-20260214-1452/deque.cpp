@@ -39,8 +39,10 @@ T Deque<T>::PopL() {
     T removed = data[n1];
     n1++; // new start of data vector
     n2--; // decrease count if data size
-    if (IsEmpty()) n1 = 0; // reset start
-    
+    if (IsEmpty()) {
+        n1 = 0; // reset start
+        data.clear();
+    }
     else if (n2 <= n1) {
         vector<T> newData;
         for (int i = n1; i < n1 + n2; i++) {
