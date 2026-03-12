@@ -7,6 +7,10 @@
 #include "treasuremap-private.h"
 #include "treasuremap.h"
 #include "queue.h"
+
+#define BLUEMASK 0b00000011
+#define GREENMASK 0b00001100
+#define REDMASK 0b00110000
 using namespace std;
 
 TreasureMap::TreasureMap(const PNG& baseim, const PNG& mazeim, pair<int, int> s) {
@@ -16,13 +20,25 @@ TreasureMap::TreasureMap(const PNG& baseim, const PNG& mazeim, pair<int, int> s)
 }
 
 void TreasureMap::SetGrey(PNG& im, pair<int, int> loc) {
-	greyscale(im, loc);
-
+	RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
+	pixel -> r = 2 * (pixel -> r / 4); 
+	pixel -> g = 2 * (pixel -> g / 4);
+	pixel -> b = 2 * (pixel -> b / 4);
 }
 
 void TreasureMap::SetLOB(PNG& im, pair<int, int> loc, int d) {
-	/* YOUR CODE HERE */
+	int bitd = d % 64;
 
+	int rVal = bitd & REDMASK; 
+	int gVal = bitd & GREENMASK; 
+	int bVal = bitd & BLUEMASK; 
+	
+
+	RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
+	
+	pixel -> r |= ( rVal >> 4 ); 
+	pixel -> g |= ( gVal >> 2 ); 
+	pixel -> b |= ( bVal >> 0 ); 
 }
 
 PNG TreasureMap::RenderMap() {
@@ -52,10 +68,3 @@ vector<pair<int, int>> TreasureMap::Neighbours(pair<int, int> curr) {
 * FUNCTIONS IN treasuremap-private.h, COMPLETE *
 * THEIR IMPLEMENTATIONS BELOW                  *
 ***********************************************/
-
-void greyscale(PNG &image, pair<int,int> p){
-	RGBAPixel *pixel = image.getPixel(p.first, p.second);
-	pixel -> r = 2 * (pixel -> r / 4); 
-	pixel -> g = 2 * (pixel -> g / 4);
-	pixel -> b = 2 * (pixel -> b / 4);
-}
