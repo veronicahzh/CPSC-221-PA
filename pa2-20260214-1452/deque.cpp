@@ -45,13 +45,10 @@ T Deque<T>::PopL() {
         data.clear();
     }
     else if (head >= data.size() / 2) {
-        vector<T> newData;
-        for (int i = head; i < head + size; i++) {
-            newData.push_back(data[i]); // copy elements from data to newData
-        }
-        data = newData;
-        head = 0; // reset start
+        data = vector<T>(data.begin() + head, data.begin() + head + size);
+        head = 0; 
     }
+    return removed; 
 
     return removed;
 }
