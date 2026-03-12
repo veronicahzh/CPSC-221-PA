@@ -2,6 +2,7 @@
  * @file deque.cpp
  * @description Implementations for PA2, Deque class
  * @author (vhzh)
+ * @author (aguha01)
 **/
 
 #include "deque.h"
