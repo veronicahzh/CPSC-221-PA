@@ -8,3 +8,4 @@
  *              Write your function prototypes as if they appear on line 145
  *              of treasuremap.h
 **/
+void greyscale(PNG &image, pair<int,int> p); 

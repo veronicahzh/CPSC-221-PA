@@ -4,15 +4,15 @@
  * @author (vhzh)
  * @author (aguha01)
 **/
-
+#include "treasuremap-private.h"
 #include "treasuremap.h"
 #include "queue.h"
 using namespace std;
 
 TreasureMap::TreasureMap(const PNG& baseim, const PNG& mazeim, pair<int, int> s) {
-	/* YOUR CODE HERE */
-
-
+	base = baseim;
+	maze = mazeim; 
+	start = s; 
 }
 
 void TreasureMap::SetGrey(PNG& im, pair<int, int> loc) {
@@ -52,3 +52,10 @@ vector<pair<int, int>> TreasureMap::Neighbours(pair<int, int> curr) {
 * FUNCTIONS IN treasuremap-private.h, COMPLETE *
 * THEIR IMPLEMENTATIONS BELOW                  *
 ***********************************************/
+
+void greyscale(PNG &image, pair<int,int> p){
+	RGBAPixel *pixel = image.getPixel(p.first, p.second);
+	pixel -> r = 2 * (pixel -> r / 4); 
+	pixel -> g = 2 * (pixel -> g / 4);
+	pixel -> b = 2 * (pixel -> b / 4);
+}
