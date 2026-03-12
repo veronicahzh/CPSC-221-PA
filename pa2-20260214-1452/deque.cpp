@@ -49,8 +49,6 @@ T Deque<T>::PopL() {
         head = 0; 
     }
     return removed; 
-
-    return removed;
 }
 /**
  * Removes the object at the right of the Deque, and returns it to the
