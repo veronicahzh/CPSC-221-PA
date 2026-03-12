@@ -1,7 +1,8 @@
 /**
  * @file treasuremap.cpp
  * @description Implementations for PA2, TreasureMap class
- * @author (your CWLs)
+ * @author (vhzh)
+ * @author (aguha01)
 **/
 
 #include "treasuremap.h"
@@ -11,10 +12,11 @@ using namespace std;
 TreasureMap::TreasureMap(const PNG& baseim, const PNG& mazeim, pair<int, int> s) {
 	/* YOUR CODE HERE */
 
+
 }
 
 void TreasureMap::SetGrey(PNG& im, pair<int, int> loc) {
-	/* YOUR CODE HERE */
+	greyscale(im, loc);
 
 }
 
