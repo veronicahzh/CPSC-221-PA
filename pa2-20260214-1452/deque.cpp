@@ -67,17 +67,10 @@ T Deque<T>::PopR() {
     T removed = data[head + size - 1];
     size--;
     data.pop_back();
-    if (IsEmpty()) head = 0;
-
-    else if (size <= head) {
-        vector<T> newData;
-        for (int i = head; i < head + size; i++) {
-            newData.push_back(data[i]); // copy elements from data to newData
-        }
-        data = newData;
-        head = 0; // reset start
+    if (IsEmpty()) {
+        head = 0;
+        data.clear();
     }
-    
     return removed;
 }
 
