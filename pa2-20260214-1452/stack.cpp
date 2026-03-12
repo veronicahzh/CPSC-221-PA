@@ -29,7 +29,7 @@ void Stack<T>::Push(T newItem) {
 template <class T>
 T Stack<T>::Pop() {
     /* YOUR CODE HERE! */
-    T removed;
+    T removed = myStack.PopR();
 
     return removed;
 }
