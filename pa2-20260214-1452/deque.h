@@ -115,8 +115,8 @@ class Deque
 
 	private:
 		vector<T> data;  /* Store the deque data here! */
-		int n1;  
-		int n2; 
+		int head;  
+		int size;  
 };
 
 #include "deque.cpp"

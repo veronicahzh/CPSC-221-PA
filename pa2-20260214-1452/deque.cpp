@@ -10,8 +10,8 @@
 template <class T>
 Deque<T>::Deque() {
     /* YOUR CODE HERE! */
-    n1 = 0;
-    n2 = 0;
+    head = 0;
+    size = 0;
 }
 
 /**
@@ -23,7 +23,7 @@ template <class T>
 void Deque<T>::PushR(T newItem) {
     /* YOUR CODE HERE! */
     data.push_back(newItem);
-    n2++; // increase data size
+    size++; // increase data size
 }
 
 /**
@@ -37,20 +37,20 @@ void Deque<T>::PushR(T newItem) {
 template <class T>
 T Deque<T>::PopL() {
     /* YOUR CODE HERE! */
-    T removed = data[n1];
-    n1++; // new start of data vector
-    n2--; // decrease count if data size
+    T removed = data[head];
+    head++; // new start of data vector
+    size--; // decrease count if data size
     if (IsEmpty()) {
-        n1 = 0; // reset start
+        head = 0; // reset start
         data.clear();
     }
-    else if (n2 <= n1) {
+    else if (head >= data.size() / 2) {
         vector<T> newData;
-        for (int i = n1; i < n1 + n2; i++) {
+        for (int i = head; i < head + size; i++) {
             newData.push_back(data[i]); // copy elements from data to newData
         }
         data = newData;
-        n1 = 0; // reset start
+        head = 0; // reset start
     }
 
     return removed;
@@ -64,18 +64,18 @@ T Deque<T>::PopL() {
 template <class T>
 T Deque<T>::PopR() {
     /* YOUR CODE HERE! */
-    T removed = data[n1 + n2 - 1];
-    n2--;
+    T removed = data[head + size - 1];
+    size--;
     data.pop_back();
-    if (IsEmpty()) n1 = 0;
+    if (IsEmpty()) head = 0;
 
-    else if (n2 <= n1) {
+    else if (size <= head) {
         vector<T> newData;
-        for (int i = n1; i < n1 + n2; i++) {
+        for (int i = head; i < head + size; i++) {
             newData.push_back(data[i]); // copy elements from data to newData
         }
         data = newData;
-        n1 = 0; // reset start
+        head = 0; // reset start
     }
     
     return removed;
@@ -90,7 +90,7 @@ T Deque<T>::PopR() {
 template <class T>
 T Deque<T>::PeekL() {
     /* YOUR CODE HERE! */
-    T peeked = data[n1];
+    T peeked = data[head];
 
     return peeked;
 }
@@ -104,7 +104,7 @@ T Deque<T>::PeekL() {
 template <class T>
 T Deque<T>::PeekR() {
     /* YOUR CODE HERE! */
-    T peeked = data[n1 + n2 - 1];
+    T peeked = data[head + size - 1];
 
     return peeked;
 }
@@ -116,6 +116,6 @@ T Deque<T>::PeekR() {
 **/
 template <class T>
 bool Deque<T>::IsEmpty() const {
-    return n2 == 0;
+    return size == 0;
 
 }
