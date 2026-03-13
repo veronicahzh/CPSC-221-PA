@@ -7,9 +7,11 @@
 #include "decoder.h"
 #include "queue.h"
 #include "stack.h"
+
 #define BLUEMASK 0b00000011
 #define GREENMASK 0b00001100
 #define REDMASK 0b00110000
+#define LOWEST2BITS 0b00000011
 using namespace std;
 
 Decoder::Decoder(const PNG & tm, pair<int, int> s) : start(s), mapImg(tm) {
@@ -68,10 +70,10 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
     }
 
     RGBAPixel * nextPixel = mapImg.getPixel(next.first, next.second);
-    int encoded = ((nextPixel->r & 0b00000011) << 4)
-                  | ((nextPixel->g & 0b00000011) << 2)
-                  | (nextPixel->b & 0b00000011);
-    int expected = (d[curr.first][curr.second] + 1) % 64;
+    int encoded = ((nextPixel->r & LOWEST2BITS) << 4)
+                  | ((nextPixel->g & LOWEST2BITS) << 2)
+                  | (nextPixel->b & LOWEST2BITS);
+    int expected = (d[curr.second][curr.first] + 1) % 64;
 
     return encoded == expected;
 		
@@ -79,7 +81,6 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
 }
 
 vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
-    /* REPLACE THE LINES BELOW WITH YOUR CODE */
     int dx = 1; 
 	int dy = 1; 
 	vector<pair<int,int>> neighbours = { {curr.first - dx, curr.second }, 
@@ -90,16 +91,15 @@ vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
 }
 
 bool Decoder::Compare(RGBAPixel p, int d){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    int bitd = d % 64;
+    int bitd = (d + 1) % 64;
 
     int rVal = (bitd & REDMASK) >> 4;
     int gVal = (bitd & GREENMASK) >> 2;
     int bVal = (bitd & BLUEMASK) >> 0;
 
-    int rActual = p.r & 0b11;
-    int gActual = p.g & 0b11;
-    int bActual = p.b & 0b11;
+    int rActual = p.r & LOWEST2BITS;
+    int gActual = p.g & LOWEST2BITS;
+    int bActual = p.b & LOWEST2BITS;
 
     return (rVal == rActual) && (gVal == gActual) && (bVal == bActual);
 }
