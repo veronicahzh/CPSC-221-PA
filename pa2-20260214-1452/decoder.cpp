@@ -7,6 +7,9 @@
 #include "decoder.h"
 #include "queue.h"
 #include "stack.h"
+#define BLUEMASK 0b00000011
+#define GREENMASK 0b00001100
+#define REDMASK 0b00110000
 using namespace std;
 
 Decoder::Decoder(const PNG & tm, pair<int, int> s) : start(s), mapImg(tm) {
@@ -61,7 +64,17 @@ vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
 
 bool Decoder::Compare(RGBAPixel p, int d){
     /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return false;
+    int bitd = d % 64;
+
+    int rVal = (bitd & REDMASK) >> 4;
+    int gVal = (bitd & GREENMASK) >> 2;
+    int bVal = (bitd & BLUEMASK) >> 0;
+
+    int rActual = p.r & 0b11;
+    int gActual = p.g & 0b11;
+    int bActual = p.b & 0b11;
+
+    return (rVal == rActual) && (gVal == gActual) && (bVal == bActual);
 }
 
 /*******************************************
