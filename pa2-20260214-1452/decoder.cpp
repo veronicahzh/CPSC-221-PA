@@ -7,9 +7,11 @@
 #include "decoder.h"
 #include "queue.h"
 #include "stack.h"
+
 #define BLUEMASK 0b00000011
 #define GREENMASK 0b00001100
 #define REDMASK 0b00110000
+#define LOWEST2BITS 0b00000011
 using namespace std;
 
 Decoder::Decoder(const PNG & tm, pair<int, int> s) : start(s), mapImg(tm) {
@@ -61,9 +63,9 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
     }
 
     RGBAPixel * nextPixel = mapImg.getPixel(next.first, next.second);
-    int encoded = ((nextPixel->r & 0b00000011) << 4)
-                  | ((nextPixel->g & 0b00000011) << 2)
-                  | (nextPixel->b & 0b00000011);
+    int encoded = ((nextPixel->r & LOWEST2BITS) << 4)
+                  | ((nextPixel->g & LOWEST2BITS) << 2)
+                  | (nextPixel->b & LOWEST2BITS);
     int expected = (d[curr.first][curr.second] + 1) % 64;
 
     return encoded == expected;
