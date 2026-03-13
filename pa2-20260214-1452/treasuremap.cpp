@@ -120,9 +120,6 @@ bool TreasureMap::Good(vector<vector<bool>>& v, pair<int, int> curr, pair<int, i
 	bool inBounds = next.first >= 0 && next.second >= 0 
 				&& next.first < width 
 				&& next.second < height;
-	if (!inBounds) {
-		return false;
-	}
 
 	bool visited = v[next.first][next.second];
 	RGBAPixel * currentPixel = maze.getPixel(curr.first, curr.second);

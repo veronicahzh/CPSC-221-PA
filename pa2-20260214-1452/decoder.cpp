@@ -25,7 +25,6 @@ PNG Decoder::RenderMaze(){
 }
 
 void Decoder::SetGrey(PNG& im, pair<int, int> loc){
-    /* YOUR CODE HERE */
     RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
 	pixel -> r = 2 * (pixel -> r / 4); 
 	pixel -> g = 2 * (pixel -> g / 4);
@@ -44,8 +43,29 @@ int Decoder::PathLength(){
 }
 
 bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, int> curr, pair<int, int> next){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return false;
+    int height = (int) mapImg.height();
+	int width = (int) mapImg.width();
+
+	bool inBounds = next.first >= 0 && next.second >= 0 
+				&& next.first < width 
+				&& next.second < height;
+    if (!inBounds) {
+        return false;
+    }
+
+    if (v[next.first][next.second]) {
+        return false;
+    }
+
+    RGBAPixel * nextPixel = mapImg.getPixel(next.first, next.second);
+    int encoded = ((nextPixel->r & 0b00000011) << 4)
+                  | ((nextPixel->g & 0b00000011) << 2)
+                  | (nextPixel->b & 0b00000011);
+    int expected = (d[curr.first][curr.second] + 1) % 64;
+
+    return encoded == expected;
+		
+	
 }
 
 vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
