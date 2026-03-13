@@ -41,8 +41,15 @@ pair<int, int> Decoder::FindSpot(){
 }
 
 int Decoder::PathLength(){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return -1;
+    // d = |x1 - x2| + |y1 - y2|
+    int x1 = start.first;
+    int y1 = start.second;
+
+    pair<int, int> secondCoord = FindSpot();
+    int x2 = secondCoord.first;
+    int y2 = secondCoord.second;
+
+    return abs(x1 - x2) + abs(y1 - y2);
 }
 
 bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, int> curr, pair<int, int> next){
