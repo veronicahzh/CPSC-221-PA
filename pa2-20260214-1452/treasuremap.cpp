@@ -7,6 +7,7 @@
 #include "treasuremap-private.h"
 #include "treasuremap.h"
 #include "queue.h"
+// #include <utility>
 
 #define BLUEMASK 0b00000011
 #define GREENMASK 0b00001100
@@ -58,6 +59,8 @@ PNG TreasureMap::RenderMap() {
 
 PNG TreasureMap::RenderMaze() {
 	/* REPLACE THE LINE BELOW WITH YOUR CODE */
+    PNG baseCopy = base;
+    RGBAPixel *pixel = baseCopy.getPixel(start.first, start.second);
 	return PNG();
 }
 // visited list, current position, next = neighbor
