@@ -29,16 +29,15 @@ void TreasureMap::SetGrey(PNG& im, pair<int, int> loc) {
 void TreasureMap::SetLOB(PNG& im, pair<int, int> loc, int d) {
 	int bitd = d % 64;
 
-	int rVal = bitd & REDMASK; 
-	int gVal = bitd & GREENMASK; 
-	int bVal = bitd & BLUEMASK; 
-	
+    int rVal = (bitd & REDMASK) >> 4;
+    int gVal = (bitd & GREENMASK) >> 2;
+    int bVal = (bitd & BLUEMASK) >> 0;
 
-	RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
-	
-	pixel -> r |= ( rVal >> 4 ); 
-	pixel -> g |= ( gVal >> 2 ); 
-	pixel -> b |= ( bVal >> 0 ); 
+    RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
+
+    pixel->r = (pixel->r & 0b11111100) | rVal;  
+    pixel->g = (pixel->g & 0b11111100) | gVal;
+    pixel->b = (pixel->b & 0b11111100) | bVal;
 }
 
 PNG TreasureMap::RenderMap() {
