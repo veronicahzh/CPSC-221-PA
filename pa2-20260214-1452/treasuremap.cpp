@@ -50,7 +50,7 @@ PNG TreasureMap::RenderMap() {
 	
 	// queue
 	Queue <pair<int,int>> toSearch; 
-
+	
 	//
 	return PNG();
 }
