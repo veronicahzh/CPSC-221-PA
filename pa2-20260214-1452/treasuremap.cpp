@@ -41,7 +41,17 @@ void TreasureMap::SetLOB(PNG& im, pair<int, int> loc, int d) {
 }
 
 PNG TreasureMap::RenderMap() {
-	/* REPLACE THE LINE BELOW WITH YOUR CODE */
+	
+	// copy the first
+	PNG baseCopy = base; 
+	// is visited vector and distance vectors. 
+	vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));; 
+	vector<vector<int>> length(base.width(), vector<int>(base.height(), 0)); 
+	
+	// queue
+	Queue <pair<int,int>> toSearch; 
+
+	//
 	return PNG();
 }
 
@@ -50,18 +60,40 @@ PNG TreasureMap::RenderMaze() {
 	/* REPLACE THE LINE BELOW WITH YOUR CODE */
 	return PNG();
 }
-
+// visited list, current position, next = neighbor
 bool TreasureMap::Good(vector<vector<bool>>& v, pair<int, int> curr, pair<int, int> next) {
-	/* REPLACE THE LINE BELOW WITH YOUR CODE */
-	return false;
+	// if coordinate is < img height and < img base
+	// if coordinate is not in visited 
+	// if coordinate is the same colour.
+	int height = base.height();
+	int width = base.width();
+	
+	RGBAPixel *currentPixel = base.getPixel(curr.first, curr.second);
+	RGBAPixel * nextPixel =  base.getPixel(next.first, next.second);
+
+	bool inBounds = next.first >= 0 && next.second >= 0 
+				&& next.first < width 
+				&& next.second < height;
+	bool visited = v[next.first][next.second];
+	bool sameColour = currentPixel -> r == nextPixel -> r 
+					&& currentPixel -> g == nextPixel -> g 
+					&& currentPixel -> b == nextPixel ->b; 
+	
+	return inBounds && !visited && sameColour; 
+		
+	
 }
 
 vector<pair<int, int>> TreasureMap::Neighbours(pair<int, int> curr) {
-	/* REPLACE THE LINES BELOW WITH YOUR CODE */
-	vector<pair<int, int>> v;
-	return v;
+	int dx = 1; 
+	int dy = 1; 
+	vector<pair<int,int>> neighbours = { {curr.first - dx, curr.second }, 
+										 {curr.first, curr.second + dy },
+										 {curr.first + dx, curr.second },
+										 {curr.first, curr.second - dy }};
+	return neighbours; 
+		
 }
-
 /***********************************************
 * IF YOU DECLARED ANY ADDITIONAL PRIVATE       *
 * FUNCTIONS IN treasuremap-private.h, COMPLETE *
