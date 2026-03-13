@@ -66,7 +66,7 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
     int encoded = ((nextPixel->r & LOWEST2BITS) << 4)
                   | ((nextPixel->g & LOWEST2BITS) << 2)
                   | (nextPixel->b & LOWEST2BITS);
-    int expected = (d[curr.first][curr.second] + 1) % 64;
+    int expected = (d[curr.second][curr.first] + 1) % 64;
 
     return encoded == expected;
 		
@@ -84,15 +84,15 @@ vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
 }
 
 bool Decoder::Compare(RGBAPixel p, int d){
-    int bitd = d % 64;
+    int bitd = (d + 1) % 64;
 
     int rVal = (bitd & REDMASK) >> 4;
     int gVal = (bitd & GREENMASK) >> 2;
     int bVal = (bitd & BLUEMASK) >> 0;
 
-    int rActual = p.r & 0b11;
-    int gActual = p.g & 0b11;
-    int bActual = p.b & 0b11;
+    int rActual = p.r & LOWEST2BITS;
+    int gActual = p.g & LOWEST2BITS;
+    int bActual = p.b & LOWEST2BITS;
 
     return (rVal == rActual) && (gVal == gActual) && (bVal == bActual);
 }
