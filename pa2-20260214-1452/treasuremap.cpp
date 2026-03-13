@@ -47,13 +47,32 @@ PNG TreasureMap::RenderMap() {
 	PNG baseCopy = base; 
 	// is visited vector and distance vectors. 
 	vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));; 
-	vector<vector<int>> length(base.width(), vector<int>(base.height(), 0)); 
+	vector<vector<int>> distance(base.width(), vector<int>(base.height(), 0)); 
 	
 	// queue
 	Queue <pair<int,int>> toSearch; 
 
-	//
-	return PNG();
+	// step 3
+    isVisited[start.first][start.second] = true;      // set start as visited
+    distance[start.first][start.second] = 0;          // set distance to start to 0
+    SetLOB(baseCopy, start, 0);
+    toSearch.Enqueue(start);
+
+    // step 4
+    while (!toSearch.IsEmpty()) {
+        pair<int,int> curr = toSearch.Dequeue();
+        
+        for (auto &neighbour : Neighbours(curr)) {
+            if (Good(isVisited, curr, neighbour)) {
+                isVisited[neighbour.first][neighbour.second] = true;
+                distance[neighbour.first][neighbour.second] = distance[curr.first][curr.second] + 1;
+                SetLOB(baseCopy, neighbour, distance[neighbour.first][neighbour.second]);
+                toSearch.Enqueue(neighbour);
+            }
+        }
+    }
+        
+	return baseCopy;
 }
 
 
