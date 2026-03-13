@@ -7,6 +7,7 @@
 #include "treasuremap-private.h"
 #include "treasuremap.h"
 #include "queue.h"
+// #include <utility>
 
 #define BLUEMASK 0b00000011
 #define GREENMASK 0b00001100
@@ -42,12 +43,20 @@ void TreasureMap::SetLOB(PNG& im, pair<int, int> loc, int d) {
 
 PNG TreasureMap::RenderMap() {
 	/* REPLACE THE LINE BELOW WITH YOUR CODE */
+    PNG baseCopy = base;
+    vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));
+    vector<vector<int>> shortestPath(base.width(), vector<int>(base.height()));
+
+    // Queue<maze> toVisit = new Deque();
+    
 	return PNG();
 }
 
 
 PNG TreasureMap::RenderMaze() {
 	/* REPLACE THE LINE BELOW WITH YOUR CODE */
+    PNG baseCopy = base;
+    RGBAPixel *pixel = baseCopy.getPixel(start.first, start.second);
 	return PNG();
 }
 
