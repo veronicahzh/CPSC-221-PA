@@ -74,7 +74,6 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
 }
 
 vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
-    /* REPLACE THE LINES BELOW WITH YOUR CODE */
     int dx = 1; 
 	int dy = 1; 
 	vector<pair<int,int>> neighbours = { {curr.first - dx, curr.second }, 
@@ -85,7 +84,6 @@ vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
 }
 
 bool Decoder::Compare(RGBAPixel p, int d){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
     int bitd = d % 64;
 
     int rVal = (bitd & REDMASK) >> 4;
