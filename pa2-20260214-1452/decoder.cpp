@@ -1,7 +1,8 @@
 /**
  * @file decoder.cpp
  * @description Implementations for PA2, Decoder class
- * @author (your CWLs)
+ * @author aguha01
+ * @author vhzh
 **/
 
 #include "decoder.h"
@@ -15,13 +16,63 @@
 using namespace std;
 
 Decoder::Decoder(const PNG & tm, pair<int, int> s) : start(s), mapImg(tm) {
-    /* YOUR CODE HERE */
-    
+    int w = mapImg.width();
+    int h = mapImg.height();
+
+    vector<vector<bool>> isVisited(w, vector<bool>(h, false));
+    vector<vector<int>> distance(w, vector<int>(h, 0));
+    vector<vector<pair<int, int>>> parent(w, vector<pair<int, int>>(h, {-1, -1}));
+    Queue<pair<int, int>> toSearch;
+
+    isVisited[start.first][start.second] = true;
+    distance[start.first][start.second] = 0;
+    toSearch.Enqueue(start);
+
+    pair<int, int> farthest = start;
+    int maxDist = 0;
+
+    while (!toSearch.IsEmpty()) {
+        pair<int, int> curr = toSearch.Dequeue();
+
+        // Note: Use >= so if multiple nodes are at maxDist, the last visited (often the real end) is kept.
+        // Wait: The specification usually implies the furthest node, if tied, it's just one furthest.
+        if (distance[curr.first][curr.second] >= maxDist) {
+            maxDist = distance[curr.first][curr.second];
+            farthest = curr;
+        }
+
+        for (auto & neighbour : Neighbours(curr)) {
+            if (Good(isVisited, distance, curr, neighbour)) {
+                isVisited[neighbour.first][neighbour.second] = true;
+                distance[neighbour.first][neighbour.second] = distance[curr.first][curr.second] + 1;
+                parent[neighbour.first][neighbour.second] = curr;
+                toSearch.Enqueue(neighbour);
+            }
+        }
+    }
+
+    pair<int, int> curr = farthest;
+    Stack<pair<int, int>> reversePath;
+    while (curr.first != -1 && curr.second != -1 && curr != start) {
+        reversePath.Push(curr);
+        curr = parent[curr.first][curr.second];
+    }
+    reversePath.Push(start);
+
+    while (!reversePath.IsEmpty()) {
+        pathPts.push_back(reversePath.Pop());
+    }
 }
 
 PNG Decoder::RenderSolution(){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return PNG();
+    PNG copy = mapImg;
+    for (auto &p : pathPts) {
+        RGBAPixel *pixel = copy.getPixel(p.first, p.second);
+        pixel->r = 255;
+        pixel->g = 0;
+        pixel->b = 0;
+    }
+    return copy;
 }
 
 PNG Decoder::RenderMaze(){
@@ -70,50 +121,12 @@ void Decoder::SetGrey(PNG& im, pair<int, int> loc){
 }
 
 pair<int, int> Decoder::FindSpot(){
-    vector<vector<bool>> isVisited(mapImg.width(), vector<bool>(mapImg.height(), false));
-    vector<vector<int>> distance(mapImg.width(), vector<int>(mapImg.height(), 0));
-    Queue<pair<int, int>> toSearch;
-
-    isVisited[start.first][start.second] = true;
-    distance[start.first][start.second] = 0;
-    toSearch.Enqueue(start);
-
-    pair<int, int> spot = start;
-    int maxDist = 0;
-
-    while (!toSearch.IsEmpty()) {
-        pair<int, int> curr = toSearch.Dequeue();
-
-        for (auto & neighbour : Neighbours(curr)) {
-            if (Good(isVisited, distance, curr, neighbour)) {
-                isVisited[neighbour.first][neighbour.second] = true;
-                distance[neighbour.first][neighbour.second] = distance[curr.first][curr.second] + 1;
-                toSearch.Enqueue(neighbour);
-
-                int newDist = distance[neighbour.first][neighbour.second];
-
-                if (newDist >= maxDist) {
-                    maxDist = newDist;
-                    spot = neighbour;
-                }
-            }
-        }
-    }
-
-    
-    return spot;
+    if (pathPts.empty()) return start;
+    return pathPts.back();
 }
 
 int Decoder::PathLength(){
-    // d = |x1 - x2| + |y1 - y2|
-    int x1 = start.first;
-    int y1 = start.second;
-
-    pair<int, int> secondCoord = FindSpot();
-    int x2 = secondCoord.first;
-    int y2 = secondCoord.second;
-
-    return abs(x1 - x2) + abs(y1 - y2);
+    return pathPts.size();
 }
 
 bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, int> curr, pair<int, int> next){
