@@ -25,8 +25,41 @@ PNG Decoder::RenderSolution(){
 }
 
 PNG Decoder::RenderMaze(){
-    /* REPLACE THE LINE BELOW WITH YOUR CODE */
-    return PNG();
+    PNG mapCopy = mapImg;
+
+    vector<vector<bool>> isVisited(mapImg.width(), vector<bool>(mapImg.height(), false));
+    vector<vector<int>> distance(mapImg.height(), vector<int>(mapImg.width(), 0));
+    Queue<pair<int, int>> toSearch;
+
+    isVisited[start.first][start.second] = true;
+    distance[start.second][start.first] = 0;
+    toSearch.Enqueue(start);
+
+    while (!toSearch.IsEmpty()) {
+        pair<int, int> curr = toSearch.Dequeue();
+        SetGrey(mapCopy, curr);
+
+        for (auto & neighbour : Neighbours(curr)) {
+            if (Good(isVisited, distance, curr, neighbour)) {
+                isVisited[neighbour.first][neighbour.second] = true;
+                distance[neighbour.second][neighbour.first] = distance[curr.second][curr.first] + 1;
+                toSearch.Enqueue(neighbour);
+            }
+        }
+    }
+
+    for (int x = start.first - 3; x <= start.first + 3; x++) {
+        for (int y = start.second - 3; y <= start.second + 3; y++) {
+            if (x >= 0 && y >= 0 && x < (int) mapImg.width() && y < (int) mapImg.height()) {
+                RGBAPixel * pixel = mapCopy.getPixel(x, y);
+                pixel->r = 255;
+                pixel->g = 0;
+                pixel->b = 0;
+            }
+        }
+    }
+
+    return mapCopy;
 }
 
 void Decoder::SetGrey(PNG& im, pair<int, int> loc){
@@ -76,8 +109,7 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
     int expected = (d[curr.second][curr.first] + 1) % 64;
 
     return encoded == expected;
-		
-	
+    
 }
 
 vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
