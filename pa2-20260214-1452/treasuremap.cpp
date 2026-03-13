@@ -46,7 +46,7 @@ PNG TreasureMap::RenderMap() {
 	// copy the first
 	PNG baseCopy = base; 
 	// is visited vector and distance vectors. 
-	vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));; 
+	vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));
 	vector<vector<int>> distance(base.width(), vector<int>(base.height(), 0)); 
 	
 	// queue
@@ -77,29 +77,57 @@ PNG TreasureMap::RenderMap() {
 
 
 PNG TreasureMap::RenderMaze() {
-	/* REPLACE THE LINE BELOW WITH YOUR CODE */
-    PNG baseCopy = base;
-    RGBAPixel *pixel = baseCopy.getPixel(start.first, start.second);
-	return PNG();
+	PNG baseCopy = base;
+
+	vector<vector<bool>> isVisited(base.width(), vector<bool>(base.height(), false));
+	Queue <pair<int,int>> toSearch; 
+
+	isVisited[start.first][start.second] = true;
+	toSearch.Enqueue(start);
+
+	while (!toSearch.IsEmpty()) {
+        pair<int,int> curr = toSearch.Dequeue();
+		SetGrey(baseCopy, curr);
+		
+		for (auto &neighbour : Neighbours(curr)) {
+            
+			if (Good(isVisited, curr, neighbour)) {
+                isVisited[neighbour.first][neighbour.second] = true;
+				toSearch.Enqueue(neighbour);
+			}
+		}
+
+	}
+
+	for (int x = start.first - 3; x <= start.first + 3; x++) {
+		for (int y = start.second - 3; y <= start.second + 3; y++) {
+			if (x >= 0 && y >= 0 && x < (int) base.width() && y < (int) base.height()) {
+				RGBAPixel * pixel = baseCopy.getPixel(x, y);
+				pixel->r = 255;
+				pixel->g = 0;
+				pixel->b = 0;
+			}
+		}
+	}
+
+	return baseCopy; 
 }
 // visited list, current position, next = neighbor
 bool TreasureMap::Good(vector<vector<bool>>& v, pair<int, int> curr, pair<int, int> next) {
-	// if coordinate is < img height and < img base
-	// if coordinate is not in visited 
-	// if coordinate is the same colour.
-	int height = base.height();
-	int width = base.width();
-	
-	RGBAPixel *currentPixel = base.getPixel(curr.first, curr.second);
-	RGBAPixel * nextPixel =  base.getPixel(next.first, next.second);
+	int height = (int) base.height();
+	int width = (int) base.width();
 
 	bool inBounds = next.first >= 0 && next.second >= 0 
 				&& next.first < width 
 				&& next.second < height;
+	if (!inBounds) {
+		return false;
+	}
+
 	bool visited = v[next.first][next.second];
-	bool sameColour = currentPixel -> r == nextPixel -> r 
-					&& currentPixel -> g == nextPixel -> g 
-					&& currentPixel -> b == nextPixel ->b; 
+	RGBAPixel * currentPixel = maze.getPixel(curr.first, curr.second);
+	RGBAPixel * nextPixel =  maze.getPixel(next.first, next.second);
+	bool sameColour = (*currentPixel == *nextPixel);
 	
 	return inBounds && !visited && sameColour; 
 		
