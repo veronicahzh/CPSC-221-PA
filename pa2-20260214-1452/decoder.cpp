@@ -71,7 +71,32 @@ void Decoder::SetGrey(PNG& im, pair<int, int> loc){
 
 pair<int, int> Decoder::FindSpot(){
     /* REPLACE THE LINES BELOW WITH YOUR CODE */
+    PNG mapCopy = mapImg;
+
+    vector<vector<bool>> isVisited(mapImg.width(), vector<bool>(mapImg.height(), false));
+    vector<vector<int>> distance(mapImg.height(), vector<int>(mapImg.width(), 0));
+    Queue<pair<int, int>> toSearch;
+
+    isVisited[start.first][start.second] = true;
+    distance[start.first][start.second] = 0;
+    toSearch.Enqueue(start);
+
     pair<int, int> spot;
+    int maxDist = 0;
+
+    while (!toSearch.IsEmpty()) {
+        pair<int, int> curr = toSearch.Dequeue();
+
+        for (auto & neighbour : Neighbours(curr)) {
+            if (Good(isVisited, distance, curr, neighbour)) {
+                isVisited[neighbour.first][neighbour.second] = true;
+                distance[neighbour.first][neighbour.second] = distance[curr.first][curr.second] + 1;
+                toSearch.Enqueue(neighbour);
+            }
+        }
+    }
+
+    
     return spot;
 }
 
