@@ -26,7 +26,10 @@ PNG Decoder::RenderMaze(){
 
 void Decoder::SetGrey(PNG& im, pair<int, int> loc){
     /* YOUR CODE HERE */
-    
+    RGBAPixel *pixel = im.getPixel(loc.first, loc.second);
+	pixel -> r = 2 * (pixel -> r / 4); 
+	pixel -> g = 2 * (pixel -> g / 4);
+	pixel -> b = 2 * (pixel -> b / 4);
 }
 
 pair<int, int> Decoder::FindSpot(){
@@ -47,8 +50,13 @@ bool Decoder::Good(vector<vector<bool>>& v, vector<vector<int>>& d, pair<int, in
 
 vector<pair<int, int>> Decoder::Neighbours(pair<int, int> curr) {
     /* REPLACE THE LINES BELOW WITH YOUR CODE */
-    vector<pair<int, int>> v;
-    return v;
+    int dx = 1; 
+	int dy = 1; 
+	vector<pair<int,int>> neighbours = { {curr.first - dx, curr.second }, 
+										 {curr.first, curr.second + dy },
+										 {curr.first + dx, curr.second },
+										 {curr.first, curr.second - dy }};
+	return neighbours; 
 }
 
 bool Decoder::Compare(RGBAPixel p, int d){
