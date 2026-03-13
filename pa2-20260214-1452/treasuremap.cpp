@@ -51,6 +51,7 @@ PNG TreasureMap::RenderMap() {
 	
 	// queue
 	Queue <pair<int,int>> toSearch; 
+<<<<<<< HEAD
 
 	// step 3
     isVisited[start.first][start.second] = true;      // set start as visited
@@ -73,6 +74,11 @@ PNG TreasureMap::RenderMap() {
     }
         
 	return baseCopy;
+=======
+	
+	//
+	return PNG();
+>>>>>>> main
 }
 
 
