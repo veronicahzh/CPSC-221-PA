@@ -34,8 +34,6 @@ Decoder::Decoder(const PNG & tm, pair<int, int> s) : start(s), mapImg(tm) {
     while (!toSearch.IsEmpty()) {
         pair<int, int> curr = toSearch.Dequeue();
 
-        // Note: Use >= so if multiple nodes are at maxDist, the last visited (often the real end) is kept.
-        // Wait: The specification usually implies the furthest node, if tied, it's just one furthest.
         if (distance[curr.first][curr.second] >= maxDist) {
             maxDist = distance[curr.first][curr.second];
             farthest = curr;
