@@ -18,7 +18,7 @@ TriTree::TriTree(PNG& imIn) {
 }
 
 void TriTree::Clear() {
-	Clear(root);
+	this->Clear(root);
     root = nullptr;
 }
 
@@ -30,7 +30,7 @@ void TriTree::Copy(const TriTree& other) {
 
 PNG TriTree::Render() const {
 	PNG img(width, height);
-    Render(root, img);
+    const_cast<TriTree*>(this)->Render(root, img);
     return img;
 }
 
@@ -46,7 +46,7 @@ void TriTree::Prune(double tol) {
 }
 
 int TriTree::NumLeaves() const {
-	return NumLeaves(root);
+	return const_cast<TriTree*>(this)->NumLeaves(root);
 }
 
 Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
@@ -54,49 +54,47 @@ Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
 
     Node *node = new Node(ul, w, h);
 
-    // Leaf node base case
     if (w == 1 && h == 1) {
         node->avg = *im.getPixel(ul.first, ul.second);
         return node;
     }
 
-    if (w >= h) {
-        int wA = w / 3;
-        int wB = w / 3;
-        int wC = w / 3;
-        
-        if (w % 3 == 1) {
-            wB++;
-        } else if (w % 3 == 2) {
-            wA++;
-            wC++;
-        }
+    bool splitWide = (w >= h);
+    int longSide = splitWide ? w : h;
 
-        node->A = BuildNode(im, ul, wA, h);
-        if (wB > 0) node->B = BuildNode(im, make_pair(ul.first + wA, ul.second), wB, h);
-        if (wC > 0) node->C = BuildNode(im, make_pair(ul.first + wA + wB, ul.second), wC, h);
-    } else {
-        int hA = h / 3;
-        int hB = h / 3;
-        int hC = h / 3;
-        
-        if (h % 3 == 1) {
-            hB++;
-        } else if (h % 3 == 2) {
-            hA++;
-            hC++;
-        }
-        
-        node->A = BuildNode(im, ul, w, hA);
-        if (hB > 0) node->B = BuildNode(im, make_pair(ul.first, ul.second + hA), w, hB);
-        if (hC > 0) node->C = BuildNode(im, make_pair(ul.first, ul.second + hA + hB), w, hC);
+    int partA = longSide / 3;
+    int partB = longSide / 3;
+    int partC = longSide / 3;
+
+    if (longSide % 3 == 1) {
+        partB++;
+    } else if (longSide % 3 == 2) {
+        partA++;
+        partC++;
     }
 
-    // Fix 2: Calculate the average color for this internal node based on its children's areas
+    if (splitWide) {
+        node->A = BuildNode(im, ul, partA, h);
+        if (partB > 0) {
+            node->B = BuildNode(im, make_pair(ul.first + partA, ul.second), partB, h);
+        }
+        if (partC > 0) {
+            node->C = BuildNode(im, make_pair(ul.first + partA + partB, ul.second), partC, h);
+        }
+    } else {
+        node->A = BuildNode(im, ul, w, partA);
+        if (partB > 0) {
+            node->B = BuildNode(im, make_pair(ul.first, ul.second + partA), w, partB);
+        }
+        if (partC > 0) {
+            node->C = BuildNode(im, make_pair(ul.first, ul.second + partA + partB), w, partC);
+        }
+    }
+
     long long r = 0, g = 0, b = 0, a = 0;
     long long totalArea = 0;
 
-    auto accumulateChild = [&](Node* child) {
+    auto addChildAverage = [&](Node* child) {
         if (child) {
             long long area = child->width * child->height;
             r += child->avg.r * area;
@@ -107,9 +105,9 @@ Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
         }
     };
 
-    accumulateChild(node->A);
-    accumulateChild(node->B);
-    accumulateChild(node->C);
+    addChildAverage(node->A);
+    addChildAverage(node->B);
+    addChildAverage(node->C);
 
     if (totalArea > 0) {
         node->avg.r = r / totalArea;
@@ -123,7 +121,7 @@ Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
 
 /*==== ALSO IMPLEMENT ANY PRIVATE FUNCTIONS YOU HAVE DECLARED ====*/
 
-void Clear(Node *node) {
+void TriTree::Clear(Node *node) {
     if (!node) return;
     Clear(node->A);
     Clear(node->B);
@@ -131,7 +129,7 @@ void Clear(Node *node) {
     delete node;
 }
 
-Node* Copy(Node *node) {
+Node* TriTree::Copy(Node *node) {
     if (!node) return nullptr;
     Node* newNode = new Node(node->upperleft, node->width, node->height);
     newNode->avg = node->avg;
@@ -141,7 +139,7 @@ Node* Copy(Node *node) {
     return newNode;
 }
 
-void Render(Node *node, PNG& img) {
+void TriTree::Render(Node *node, PNG& img) {
     if (!node) return;
     if (!node->A && !node->B && !node->C) {
         for (int x = node->upperleft.first; x < node->upperleft.first + node->width; x++) {
@@ -156,7 +154,7 @@ void Render(Node *node, PNG& img) {
     Render(node->C, img);
 }
 
-void Transpose(Node *node) {
+void TriTree::Transpose(Node *node) {
     if (!node) return;
 
     int tempX = node->upperleft.first;
@@ -172,13 +170,11 @@ void Transpose(Node *node) {
     Transpose(node->C);
 }
 
-// Fix 3: The second recursive helper for checking if a subtree is prunable
-bool Prunable(Node* node, RGBAPixel targetAvg, double tol) {
+bool TriTree::Prunable(Node *node, RGBAPixel targetAvg, double tol) {
     if (!node) return true;
     
-    // If it's a leaf node, check if its color distance is within tolerance
     if (!node->A && !node->B && !node->C) {
-        // Cast to double to prevent unsigned char underflow when subtracting
+        
         double rDist = (double)node->avg.r - (double)targetAvg.r;
         double gDist = (double)node->avg.g - (double)targetAvg.g;
         double bDist = (double)node->avg.b - (double)targetAvg.b;
@@ -187,17 +183,15 @@ bool Prunable(Node* node, RGBAPixel targetAvg, double tol) {
         return distSq <= (tol * tol);
     }
     
-    // Otherwise, all children must be prunable
     return Prunable(node->A, targetAvg, tol) && 
            Prunable(node->B, targetAvg, tol) && 
            Prunable(node->C, targetAvg, tol);
 }
 
-void Prune(Node *node, double tol) {
+void TriTree::Prune(Node *node, double tol) {
     if (!node) return;
-    if (!node->A && !node->B && !node->C) return; // leaf
-
-    // Use our new helper to check if this entire subtree can be pruned
+    if (!node->A && !node->B && !node->C) return; 
+    
     if (Prunable(node, node->avg, tol)) {
         Clear(node->A);
         node->A = nullptr;
@@ -212,8 +206,8 @@ void Prune(Node *node, double tol) {
     }
 }
 
-int NumLeaves(Node *node) {
+int TriTree::NumLeaves(Node *node) {
     if (!node) return 0;
     if (!node->A && !node->B && !node->C) return 1;
-    return NumLeaves(node->A) + NumLeaves(node->B) + NumLeaves(node->C);
+    return NumLeaves(node->A) + NumLeaves(node->B) + NumLeaves(node->C); 
 }
