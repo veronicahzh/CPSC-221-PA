@@ -12,9 +12,9 @@
 
 void Clear(Node* node);
 Node* Copy(Node* node);
-void Render(Node* node, PNG& img);
+void Render(const Node* node, PNG& img) const;
 void Transpose(Node* node);
-bool Prunable(Node* node, RGBAPixel targetAvg, double tol);
+bool Prunable(const Node* node, RGBAPixel targetAvg, double tol) const;
 void Prune(Node* node, double tol);
-int NumLeaves(Node* node);
+int NumLeaves(const Node* node) const;
 

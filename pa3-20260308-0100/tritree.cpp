@@ -8,10 +8,8 @@
 **/
 
 #include "tritree.h"
-#include "tritree-private.h"
 
 TriTree::TriTree(PNG& imIn) {
-	// REPLACE THE LINEs BELOW WITH YOUR CODE
 	width = imIn.width();
 	height = imIn.height();
 	root = BuildNode(imIn, make_pair(0, 0), width, height);
@@ -30,7 +28,7 @@ void TriTree::Copy(const TriTree& other) {
 
 PNG TriTree::Render() const {
 	PNG img(width, height);
-    const_cast<TriTree*>(this)->Render(root, img);
+    Render(root, img);
     return img;
 }
 
@@ -46,7 +44,7 @@ void TriTree::Prune(double tol) {
 }
 
 int TriTree::NumLeaves() const {
-	return const_cast<TriTree*>(this)->NumLeaves(root);
+	return NumLeaves(root);
 }
 
 Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
@@ -91,30 +89,31 @@ Node* TriTree::BuildNode(PNG& im, pair<int, int> ul, int w, int h) {
         }
     }
 
-    long long r = 0, g = 0, b = 0, a = 0;
+    long long redSum = 0;
+    long long greenSum = 0;
+    long long blueSum = 0;
+    double alphaSum = 0.0;
     long long totalArea = 0;
 
     auto addChildAverage = [&](Node* child) {
-        if (child) {
-            long long area = child->width * child->height;
-            r += child->avg.r * area;
-            g += child->avg.g * area;
-            b += child->avg.b * area;
-            a += child->avg.a * area;
-            totalArea += area;
-        }
+        if (!child) return;
+
+        long long area = static_cast<long long>(child->width) * child->height;
+        redSum += child->avg.r * area;
+        greenSum += child->avg.g * area;
+        blueSum += child->avg.b * area;
+        alphaSum += child->avg.a * area;
+        totalArea += area;
     };
 
     addChildAverage(node->A);
     addChildAverage(node->B);
     addChildAverage(node->C);
 
-    if (totalArea > 0) {
-        node->avg.r = r / totalArea;
-        node->avg.g = g / totalArea;
-        node->avg.b = b / totalArea;
-        node->avg.a = a / totalArea;
-    }
+    node->avg.r = static_cast<unsigned char>(redSum / totalArea);
+    node->avg.g = static_cast<unsigned char>(greenSum / totalArea);
+    node->avg.b = static_cast<unsigned char>(blueSum / totalArea);
+    node->avg.a = alphaSum / totalArea;
 
     return node;
 }
@@ -139,7 +138,7 @@ Node* TriTree::Copy(Node *node) {
     return newNode;
 }
 
-void TriTree::Render(Node *node, PNG& img) {
+void TriTree::Render(const Node *node, PNG& img) const {
     if (!node) return;
     if (!node->A && !node->B && !node->C) {
         for (int x = node->upperleft.first; x < node->upperleft.first + node->width; x++) {
@@ -170,17 +169,11 @@ void TriTree::Transpose(Node *node) {
     Transpose(node->C);
 }
 
-bool TriTree::Prunable(Node *node, RGBAPixel targetAvg, double tol) {
+bool TriTree::Prunable(const Node *node, RGBAPixel targetAvg, double tol) const {
     if (!node) return true;
     
     if (!node->A && !node->B && !node->C) {
-        
-        double rDist = (double)node->avg.r - (double)targetAvg.r;
-        double gDist = (double)node->avg.g - (double)targetAvg.g;
-        double bDist = (double)node->avg.b - (double)targetAvg.b;
-        
-        double distSq = (rDist * rDist) + (gDist * gDist) + (bDist * bDist);
-        return distSq <= (tol * tol);
+        return node->avg.dist(targetAvg) <= tol;
     }
     
     return Prunable(node->A, targetAvg, tol) && 
@@ -206,7 +199,7 @@ void TriTree::Prune(Node *node, double tol) {
     }
 }
 
-int TriTree::NumLeaves(Node *node) {
+int TriTree::NumLeaves(const Node *node) const {
     if (!node) return 0;
     if (!node->A && !node->B && !node->C) return 1;
     return NumLeaves(node->A) + NumLeaves(node->B) + NumLeaves(node->C); 
